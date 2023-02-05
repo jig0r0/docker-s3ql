@@ -1,7 +1,5 @@
 FROM python:3.8-alpine AS build
 
-ARG S3QL_VERSION=3.8.0
-
 COPY requirements.txt /
 RUN apk --no-cache add curl gnupg jq bzip2 g++ make pkgconfig fuse3-dev sqlite-dev libffi-dev openssl-dev cargo
 RUN pip install --user --ignore-installed -r requirements.txt
@@ -22,7 +20,6 @@ COPY --from=build /root/.local/bin/ /usr/local/bin/
 COPY --from=build /root/.local/lib/ /usr/local/lib/
 COPY ./authfile.sh ./entrypoint.sh ./mount.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*.sh
-ENV MOUNTPOINT=/s3ql
 VOLUME /root/.s3ql
 HEALTHCHECK CMD ["/bin/sh","-c","s3qlstat --quiet $MOUNTPOINT"]
 ENTRYPOINT ["/bin/sh","/usr/local/bin/entrypoint.sh"]
